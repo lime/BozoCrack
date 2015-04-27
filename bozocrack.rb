@@ -37,8 +37,11 @@ class BozoCrack
   private
 
   def crack_single_hash(hash)
-    response = Net::HTTP.get URI("http://www.google.com/search?q=#{hash}")
-    wordlist = response.split(/\s+/)
+    response = Net::HTTP.get_response URI("http://www.google.com/search?q=#{hash}")
+    if response.code == '301' || response.code == '302'
+      response = Net::HTTP.get_response URI.parse(response['location'])
+    end
+    wordlist = response.body.split(/\s+/)
     if plaintext = dictionary_attack(hash, wordlist)
       return plaintext
     end
