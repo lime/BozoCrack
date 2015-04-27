@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'digest/md5'
+require 'digest/sha1'
 require 'net/http'
 
 class BozoCrack
@@ -10,7 +10,7 @@ class BozoCrack
     @cache = Hash.new
 
     File.new(filename).each_line do |line|
-      if m = line.chomp.match(/\b([a-fA-F0-9]{32})\b/)
+      if m = line.chomp.match(/\b([a-fA-F0-9]{40})\b/)
         @hashes << m[1]
       end
     end
@@ -50,7 +50,7 @@ class BozoCrack
 
   def dictionary_attack(hash, wordlist)
     wordlist.each do |word|
-      if Digest::MD5.hexdigest(word) == hash.downcase
+      if Digest::SHA1.hexdigest(word) == hash.downcase
         return word
       end
     end
@@ -78,5 +78,5 @@ end
 if ARGV.size == 1
   BozoCrack.new(ARGV[0]).crack
 else
-  puts "Usage example: ruby bozocrack.rb file_with_md5_hashes.txt"
+  puts "Usage example: ruby bozocrack.rb file_with_sha1_hashes.txt"
 end
